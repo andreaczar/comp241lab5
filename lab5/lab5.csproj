@@ -113,6 +113,9 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BadassSession.cs" />
+    <Compile Include="DatabaseHelper.cs" />
+    <Compile Include="Customer.cs" />
     <Compile Include="Headers.aspx.cs">
       <DependentUpon>Headers.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

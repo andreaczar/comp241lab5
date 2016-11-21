@@ -9,8 +9,12 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    
+            <% if (Authenticated) { %>
+            <input id="Logout" runat="server" value="Logout" type="submit" OnServerClick="LogoutUser"/>
+        <%} %>
+
     </div>
     </form>
+
 </body>
 </html>

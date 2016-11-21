@@ -8,11 +8,16 @@ using System.Web.UI.WebControls;
 
 namespace lab5 {
     public partial class Headers : System.Web.UI.Page {
+
+        public bool Authenticated { get; private set; }
+        public static string AuthCookieName = "login";
+
         protected void Page_Load(object sender, EventArgs e) {
             //Iterate through HTTP headers
             // Display their keys and values
             // Headers in Request.Header property
             // Response.Write() to generate appropriate HTML 
+            Authenticated = (Request.Cookies[Headers.AuthCookieName] != null);
 
             NameValueCollection headers = Request.Headers;
 
@@ -26,6 +31,16 @@ namespace lab5 {
             Response.Write("</pre>");
 
             //Request.Headers;
+        }
+        protected void LogoutUser(object sender, EventArgs e) {
+            Authenticated = false;
+            if (Request.Cookies[Headers.AuthCookieName] != null) {
+                DatabaseHelper.ClearSession(Request.Cookies[Headers.AuthCookieName].Value);
+                Response.Cookies[Headers.AuthCookieName].Expires = DateTime.Now.AddYears(-1);
+
+            }
+
+            Response.Redirect("Login.aspx");
         }
     }
 }
