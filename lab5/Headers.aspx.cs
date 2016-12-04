@@ -34,11 +34,7 @@ namespace lab5 {
         }
         protected void LogoutUser(object sender, EventArgs e) {
             Authenticated = false;
-            if (Request.Cookies[Headers.AuthCookieName] != null) {
-                DatabaseHelper.ClearSession(Request.Cookies[Headers.AuthCookieName].Value);
-                Response.Cookies[Headers.AuthCookieName].Expires = DateTime.Now.AddYears(-1);
-
-            }
+            Helpers.SignOut();
 
             Response.Redirect("Login.aspx");
         }

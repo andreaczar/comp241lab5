@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Configuration;
+using System.Web.Security;
 
 namespace lab5 {
 
@@ -21,13 +22,14 @@ namespace lab5 {
         public Customer RequestCustomer;
 
         protected void Page_Load(object sender, EventArgs e) {
-            if(Request.Cookies[Login.AuthCookieName] != null) {
+            Authenticated = HttpContext.Current.User.Identity.IsAuthenticated;
+
+            if (Request.Cookies[Login.AuthCookieName] != null && Authenticated) {
                 RequestCustomer = new Customer(Request.Cookies[Login.AuthCookieName].Value);
-                Authenticated = RequestCustomer.Exists;
             } else {
-                Authenticated = false;
+                RequestCustomer = new Customer("No", "body");
             }
-            
+
         }
 
         protected void ValidateUser(object sender, EventArgs e) {
@@ -36,8 +38,7 @@ namespace lab5 {
 
 
             if (Username.Text.Length > 16 || Username.Text.Length == 0) {
-                //throw an error
-                return;
+                InvalidLogin = true;
             }
             // no session cookie exists
             if (Request.Cookies[Login.AuthCookieName] == null) {
@@ -54,14 +55,31 @@ namespace lab5 {
                     Response.SetCookie(userCookie);
                     Authenticated = true;
 
+
                     try {
                         DatabaseHelper.PersistSession(userCookie.Value, customerId);
                     } catch( Exception ex) {
                         Response.Write(ex);
                     }
-                    
+                    int timeout = 2;
 
-                    Response.Redirect("Login.aspx");
+                    if (RememberMe.Checked) {
+                        timeout = (int)TimeSpan.FromDays(7).TotalMinutes;
+                    }
+
+                    FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(Username.Text, true, timeout);
+                    string encryptedTicket = FormsAuthentication.Encrypt(ticket);
+
+                    HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+                    cookie.Expires = ticket.Expiration;
+                    HttpContext.Current.Response.Cookies.Add(cookie);
+                    string requestedPage = FormsAuthentication.GetRedirectUrl(Username.Text, false);
+
+                    Customer c = Customer.GetById(customerId);  
+                    FormsAuthentication.RedirectFromLoginPage(c.Firstname + " " + c.Lastname, true);
+
+                    //Response.Redirect(requestedPage, true);
+
                     return;
 
                 } else {
@@ -72,6 +90,7 @@ namespace lab5 {
             // session cookie exists, should check it.
             } else {
                 Authenticated = true;
+
             }
 
         }
@@ -80,11 +99,7 @@ namespace lab5 {
 
         protected void LogoutUser(object sender, EventArgs e) {
             Authenticated = false;
-            if (Request.Cookies[Login.AuthCookieName] != null) {
-
-                Response.Cookies[Login.AuthCookieName].Expires = DateTime.Now.AddYears(-1);
-                DatabaseHelper.ClearSession(Request.Cookies[Login.AuthCookieName].Value);
-            }
+            Helpers.SignOut();
 
             Response.Redirect("Login.aspx");
         }

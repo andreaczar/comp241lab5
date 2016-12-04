@@ -9,8 +9,9 @@
 <body>
     <form id="form1" runat="server">
         <%--<asp:Login ID="Login1" runat="server" OnAuthenticate="ValidateUser"></asp:Login>--%>
-
+        
     <div>
+        
         
         <% if (!Authenticated) {%>
             <label>Username:</label>
@@ -19,8 +20,16 @@
             <label>Password:</label>
             <asp:TextBox ID="Password" runat="server" TextMode="Password"></asp:TextBox>
             <br />
-        
+            <asp:CheckBox ID="RememberMe" runat="server" />
+            <label>Remember Me</label>
+            <br />
             <input id="Submit1" type="submit" value="Login" runat="server" OnServerClick="ValidateUser"/>
+        
+
+           
+
+        
+
         <% } %>
         
         <% if (Authenticated) { %>

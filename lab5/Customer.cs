@@ -23,6 +23,11 @@ namespace lab5 {
             InitializeCustomer();
         }
 
+        public Customer(string first, string last) {
+            Firstname = first;
+            Lastname = last;
+        }
+
         private void InitializeCustomer() {
             SqlConnection conn = DatabaseHelper.GetConnection();
 
@@ -62,6 +67,31 @@ namespace lab5 {
             Random random = new Random();
             return new string(Enumerable.Repeat(Customer.sessionChars, 32)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static Customer GetById(int id) {
+            SqlConnection conn = DatabaseHelper.GetConnection();
+            SqlCommand command = new SqlCommand(
+                   "SELECT * " +
+                   "FROM customers " +
+                   "WHERE customerid = @ID;", conn);
+
+            command.Parameters.AddWithValue("@ID", id);
+
+            conn.Open();
+
+            SqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read()) {
+                return new Customer(
+                    Convert.ToString(reader["firstname"]),
+                    Convert.ToString(reader["lastname"])
+                );
+
+            } else {
+                return null;
+            }
+
         }
     }
 }

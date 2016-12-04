@@ -50,8 +50,8 @@ namespace lab5 {
 
                 try {
                     conn.Open();
-
                     SqlDataReader reader = command.ExecuteReader();
+                    ///REMEMBER TO CLOSE READER
 
                     if (reader.Read()) {
                         if (Convert.ToString(reader["password"]) == password) {
@@ -59,6 +59,7 @@ namespace lab5 {
                         }
                         return 0;
                     }
+                    //CLOSE READER
 
                 } catch (Exception bigbadaboom) {
 
