@@ -39,11 +39,11 @@
                     <div class="panel-body">
                         <form id="form1" runat="server">
                        
-                            <div class="form-group">
+                            <div class="form-group<% if (InvalidLogin) { %> has-error<% } %> ">
                                 <label class="control-label">Username</label>
                                 <asp:TextBox ID="Username" MaxLength="16" runat="server" CssClass="form-control"></asp:TextBox>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group<% if (InvalidLogin) { %> has-error<% } %> ">
                                 <label class="control-label">Password</label>
                                 <asp:TextBox ID="Password" runat="server" TextMode="Password" CssClass="form-control"></asp:TextBox>
                             </div>

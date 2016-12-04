@@ -7,7 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace lab5 {
-    public partial class SecuredPage : System.Web.UI.Page {
+    public partial class SecuredPage : BasePage {
         protected void Page_Load(object sender, EventArgs e) {
             lblMessage.Text = "You have reached the secured page, ";
             lblMessage.Text += User.Identity.Name + ".";
@@ -19,9 +19,9 @@ namespace lab5 {
 
             List<Sales> sales = Sales.GetAll();
 
-            foreach(Sales sale in sales) {
+            foreach (Sales sale in sales) {
                 TableRow r = new TableRow();
-                 
+
                 TableCell storeid = new TableCell();
                 storeid.Controls.Add(new LiteralControl(String.Format("{0}", sale.StoreId)));
                 r.Cells.Add(storeid);
@@ -47,14 +47,9 @@ namespace lab5 {
                 r.Cells.Add(titleId);
 
                 SalesTable.Rows.Add(r);
-            
+
             }
 
-        }
-
-        protected void cmdSignOut_Click(Object sender, EventArgs e) {
-            Helpers.SignOut();
-            Response.Redirect("~/Login.aspx");
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace lab5 {
-    public partial class Headers : System.Web.UI.Page {
+    public partial class Headers : BasePage {
 
         public bool Authenticated { get; private set; }
         public static string AuthCookieName = "login";
@@ -52,9 +52,5 @@ namespace lab5 {
             Response.Redirect("Login.aspx");
         }
 
-        protected void cmdSignOut_Click(object sender, EventArgs e) {
-            Helpers.SignOut();
-            Response.Redirect("~/Login.aspx");
-        }
     }
 }
