@@ -21,14 +21,27 @@ namespace lab5 {
 
             NameValueCollection headers = Request.Headers;
 
-            Response.Write("<pre>");
+            foreach(string key in Request.Headers) {
+                TableRow row = new TableRow();
+                TableCell header = new TableCell();
+                TableCell value = new TableCell();
 
-            foreach(string key in headers.AllKeys) {
-                Response.Write("Key: " + key + "value" + headers[key]);
-                Response.Write("<br>");
+                header.Text = key;
+                
+                value.Text = Request.Headers[key];
+                value.Attributes["width"] = "50%";
+
+                row.Cells.Add(header);
+                row.Cells.Add(value);
+                HeadersTable.Rows.Add(row);
             }
 
-            Response.Write("</pre>");
+            //foreach(string key in headers.AllKeys) {
+            //    Response.Write("Key: " + key + "value" + headers[key]);
+            //    Response.Write("<br>");
+            //}
+
+            //Response.Write("</pre>");
 
             //Request.Headers;
         }
@@ -37,6 +50,11 @@ namespace lab5 {
             Helpers.SignOut();
 
             Response.Redirect("Login.aspx");
+        }
+
+        protected void cmdSignOut_Click(object sender, EventArgs e) {
+            Helpers.SignOut();
+            Response.Redirect("~/Login.aspx");
         }
     }
 }

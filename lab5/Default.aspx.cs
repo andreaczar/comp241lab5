@@ -10,5 +10,10 @@ namespace lab5 {
         protected void Page_Load(object sender, EventArgs e) {
 
         }
+
+        protected void cmdSignOut_Click(Object sender, EventArgs e) {
+            Helpers.SignOut();
+            Response.Redirect("~/Login.aspx");
+        }
     }
 }
