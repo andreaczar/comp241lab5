@@ -30,6 +30,10 @@ namespace lab5 {
             Lastname = last;
         }
 
+        public string GetFullName() {
+            return Firstname + " " + Lastname;
+        }
+
         private void InitializeCustomer() {
             SqlConnection conn = DatabaseHelper.GetConnection();
 

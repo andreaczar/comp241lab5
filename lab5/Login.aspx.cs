@@ -61,24 +61,25 @@ namespace lab5 {
                     } catch( Exception ex) {
                         Response.Write(ex);
                     }
-                    int timeout = 0;
+
+                    Customer c = Customer.GetById(customerId);
 
                     if (RememberMe.Checked) {
-                        timeout = (int)TimeSpan.FromDays(7).TotalMinutes;
+                        // create cookie manually
+                        int timeout = (int)TimeSpan.FromDays(7.0).TotalMinutes;
+                        FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(Username.Text, RememberMe.Checked, timeout);
+                        string encryptedTicket = FormsAuthentication.Encrypt(ticket);
+
+                        HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+                        cookie.Expires = ticket.Expiration;
+                        HttpContext.Current.Response.Cookies.Add(cookie);
+                        string requestedPage = FormsAuthentication.GetRedirectUrl(c.GetFullName(), RememberMe.Checked);
+                        Response.Redirect(requestedPage, true);
+
+                    } else {
+                        // use forms auth for cookie
+                        FormsAuthentication.RedirectFromLoginPage(c.GetFullName(), RememberMe.Checked);
                     }
-
-                    FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(Username.Text, true, timeout);
-                    string encryptedTicket = FormsAuthentication.Encrypt(ticket);
-
-                    HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
-                    cookie.Expires = ticket.Expiration;
-                    HttpContext.Current.Response.Cookies.Add(cookie);
-                    string requestedPage = FormsAuthentication.GetRedirectUrl(Username.Text, false);
-
-                    Customer c = Customer.GetById(customerId);  
-                    FormsAuthentication.RedirectFromLoginPage(c.Firstname + " " + c.Lastname, true);
-
-                    //Response.Redirect(requestedPage, true);
 
                     return;
 
