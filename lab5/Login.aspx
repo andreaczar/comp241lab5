@@ -66,7 +66,7 @@
             <% } %>
            
 
-            <% if (Authenticated) { %>
+<%--            <% if (Authenticated) { %>
                 <p>
                     <b>First Name:</b> <% Response.Write(RequestCustomer.Firstname); %>
                 </p>
@@ -84,16 +84,16 @@
                 </p>
             
                 <input id="Logout" runat="server" value="Logout" type="submit" OnServerClick="LogoutUser"/>
-            <% } %>
+            <% } %>--%>
 
 
 
-        </div>
+<%--        </div>
 
             <% if (Authenticated) { %>
             <a href="Headers.aspx">Headers</a>
             <%  } %>
 
-     </div>
+     </div>--%>
 </body>
 </html>

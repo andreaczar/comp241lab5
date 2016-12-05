@@ -7,8 +7,5 @@ using System.Web.UI.WebControls;
 
 namespace lab5 {
     public partial class Default : BasePage {
-        protected void Page_Load(object sender, EventArgs e) {
-
-        }
     }
 }

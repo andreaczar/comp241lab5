@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 namespace lab5 {
     public partial class SecuredPage : BasePage {
         protected void Page_Load(object sender, EventArgs e) {
+            base.Page_Load(sender, e);
             lblMessage.Text = "You have reached the secured page, ";
             lblMessage.Text += User.Identity.Name + ".";
 

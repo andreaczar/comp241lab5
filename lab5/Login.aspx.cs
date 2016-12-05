@@ -10,9 +10,6 @@ using System.Web.Configuration;
 using System.Web.Security;
 
 namespace lab5 {
-
-   
-
     public partial class Login : System.Web.UI.Page {
 
         public static string AuthCookieName = "login";
@@ -24,11 +21,14 @@ namespace lab5 {
         protected void Page_Load(object sender, EventArgs e) {
             Authenticated = HttpContext.Current.User.Identity.IsAuthenticated;
 
-            if (Request.Cookies[Login.AuthCookieName] != null && Authenticated) {
-                RequestCustomer = new Customer(Request.Cookies[Login.AuthCookieName].Value);
-            } else {
-                RequestCustomer = new Customer("No", "body");
+            if (Authenticated) {
+                Response.Redirect("~/Default.aspx");
             }
+            //if (Request.Cookies[Login.AuthCookieName] != null && Authenticated) {
+            //    RequestCustomer = new Customer(Request.Cookies[Login.AuthCookieName].Value);
+            //} else {
+            //    //RequestCustomer = new Customer("No", "body");
+            //}
 
         }
 
@@ -41,7 +41,7 @@ namespace lab5 {
                 InvalidLogin = true;
             }
             // no session cookie exists
-            if (Request.Cookies[Login.AuthCookieName] == null) {
+            if (Request.Cookies[Login.AuthCookieName] == null || !HttpContext.Current.User.Identity.IsAuthenticated) {
 
                 //check username/password
                 // if valid username/password combo, create a session and set cookie.
@@ -61,7 +61,7 @@ namespace lab5 {
                     } catch( Exception ex) {
                         Response.Write(ex);
                     }
-                    int timeout = 2;
+                    int timeout = 0;
 
                     if (RememberMe.Checked) {
                         timeout = (int)TimeSpan.FromDays(7).TotalMinutes;
@@ -89,10 +89,8 @@ namespace lab5 {
 
             // session cookie exists, should check it.
             } else {
-                Authenticated = true;
-
+                Response.Redirect("~/Default.aspx");
             }
-
         }
 
 

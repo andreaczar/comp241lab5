@@ -4,11 +4,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.Caching;
 
 namespace lab5 {
     public class Customer {
 
         private const string sessionChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        public bool IsCached { get; set; } = false;
 
         public string Firstname { get; private set; }
         public string Lastname { get; private set; }
@@ -42,20 +44,20 @@ namespace lab5 {
                 command.Parameters.Add("@COOKIE", SqlDbType.VarChar).Value = Cookie;
 
                 //try {
-                    conn.Open();
+                conn.Open();
 
-                    SqlDataReader reader = command.ExecuteReader();
+                SqlDataReader reader = command.ExecuteReader();
 
-                    if (reader.Read()) {
-                        Exists = true;
+                if (reader.Read()) {
+                    Exists = true;
 
-                        Firstname = Convert.ToString(reader["firstname"]);
-                        Lastname = Convert.ToString(reader["lastname"]);
-                        Customerid = Convert.ToInt32(reader["customerid"]);
+                    Firstname = Convert.ToString(reader["firstname"]);
+                    Lastname = Convert.ToString(reader["lastname"]);
+                    Customerid = Convert.ToInt32(reader["customerid"]);
 
-                    } else {
-                        Exists = false;
-                    }
+                } else {
+                    Exists = false;
+                }
 
                 //} catch (Exception bigbadaboom) {
 
@@ -92,6 +94,48 @@ namespace lab5 {
                 return null;
             }
 
+        }
+
+        public static Customer GetByCookie(string sessionId) {
+
+            Customer c = GetFromCache(sessionId);
+            if (c != null) {
+                c.IsCached = true;
+                return c;
+            }
+
+            SqlConnection conn = DatabaseHelper.GetConnection();
+            using (conn) {
+                SqlCommand command = new SqlCommand(
+                    "SELECT * " +
+                    "FROM sessions " +
+                    "INNER JOIN customers ON customers.customerid = sessions.customerid " +
+                    "WHERE cookie = @COOKIE;", conn);
+
+                command.Parameters.Add("@COOKIE", SqlDbType.VarChar).Value = sessionId;
+
+                conn.Open();
+
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read()) {
+
+                    c = new Customer(
+                        Convert.ToString(reader["firstname"]),
+                        Convert.ToString(reader["lastname"])
+                    );
+
+                    HttpContext.Current.Cache.Insert(sessionId, c, null, DateTime.Now.AddSeconds(30), TimeSpan.Zero); // cache for 30s
+
+                    return c;
+
+                } else {
+                    return null;
+                }
+            }
+        }
+        public static Customer GetFromCache(string sessionId) {
+            return (Customer)HttpContext.Current.Cache.Get(sessionId);
         }
     }
 }
