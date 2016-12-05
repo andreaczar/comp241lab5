@@ -27,7 +27,7 @@ namespace lab5 {
             // validate form input
             if (Username.Text.Length > 16 || Username.Text.Length == 0) {
                 InvalidLogin = true;
-                Response.End();
+                return;
             }
 
             if (Request.Cookies[AuthManager.AuthCookieName] != null && HttpContext.Current.User.Identity.IsAuthenticated) {
@@ -39,7 +39,7 @@ namespace lab5 {
 
             if (customer == null) {
                 InvalidLogin = true;
-                Response.End();
+                return;
             }
             
             // Perform customer login

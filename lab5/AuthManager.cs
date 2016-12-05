@@ -47,7 +47,8 @@ namespace lab5 {
                 response.Redirect(requestedPage, true);
 
             } else {
-                FormsAuthentication.RedirectFromLoginPage(customer.GetFullName(), rememberMe);
+                string username = customer.GetFullName(); 
+                FormsAuthentication.RedirectFromLoginPage(username, rememberMe);
             }
         }
 

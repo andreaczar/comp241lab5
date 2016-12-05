@@ -41,6 +41,9 @@ namespace lab5 {
         }
 
         public string GetFullName() {
+            if((Firstname == null || Firstname == "") && (Lastname == null || Lastname == "")) {
+                return "Anonymous";
+            }
             return Firstname + " " + Lastname;
         }
 
@@ -49,37 +52,34 @@ namespace lab5 {
         }
 
         private void InitializeCustomer() {
+            string query = "SELECT * FROM sessions " +
+                            "INNER JOIN customers ON customers.customerid = sessions.customerid " +
+                            "WHERE cookie = @COOKIE;";
+
             SqlConnection conn = DatabaseHelper.GetConnection();
 
-            using (conn) {
+            try {
+                using (conn) {
+                    using (SqlCommand command = new SqlCommand(query, conn)) {
+                        command.Parameters.Add("@COOKIE", SqlDbType.VarChar).Value = Cookie;
+                        conn.Open();
 
-                SqlCommand command = new SqlCommand(
-                    "SELECT * " +
-                    "FROM sessions " +
-                    "INNER JOIN customers ON customers.customerid = sessions.customerid " +
-                    "WHERE cookie = @COOKIE;", conn);
+                        using (SqlDataReader reader = command.ExecuteReader()) {
+                            if (reader.Read()) {
+                                Exists = true;
 
-                command.Parameters.Add("@COOKIE", SqlDbType.VarChar).Value = Cookie;
+                                Firstname = Convert.ToString(reader["firstname"]);
+                                Lastname = Convert.ToString(reader["lastname"]);
+                                Customerid = Convert.ToInt32(reader["customerid"]);
 
-                //try {
-                conn.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read()) {
-                    Exists = true;
-
-                    Firstname = Convert.ToString(reader["firstname"]);
-                    Lastname = Convert.ToString(reader["lastname"]);
-                    Customerid = Convert.ToInt32(reader["customerid"]);
-
-                } else {
-                    Exists = false;
+                            } else {
+                                Exists = false;
+                            }
+                        }
+                    }
                 }
+            } catch (Exception ex) {
 
-                //} catch (Exception bigbadaboom) {
-
-                //}
             }
         }
 
@@ -90,70 +90,63 @@ namespace lab5 {
         }
 
         public static Customer GetById(int id) {
+            string query = "SELECT * FROM customers WHERE customerid = @ID;";
+            Customer c = null;
             SqlConnection conn = DatabaseHelper.GetConnection();
 
-            using (conn) {
+            try {
+                using (conn) {
+                    using (SqlCommand command = new SqlCommand(query, conn)) {
+                        command.Parameters.AddWithValue("@ID", id);
+                        conn.Open();
 
-                SqlCommand command = new SqlCommand(
-                        "SELECT * " +
-                        "FROM customers " +
-                        "WHERE customerid = @ID;", conn);
-
-                command.Parameters.AddWithValue("@ID", id);
-
-                conn.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read()) {
-                    return new Customer(
-                        Convert.ToInt32(reader["customerid"]),
-                        Convert.ToString(reader["username"]),
-                        Convert.ToString(reader["firstname"]),
-                        Convert.ToString(reader["lastname"]),
-                        Convert.ToString(reader["password"])
-                    );
-
-                } else {
-                    return null;
+                        using (SqlDataReader reader = command.ExecuteReader()) {
+                            if (reader.Read()) {
+                                c = ConstructCustomerFromReader(reader);
+                            }
+                        }
+                    }
                 }
+            } catch (Exception ex) {
+                HttpContext.Current.Response.Write("Whoopsies! An error occurred." + ex);
+                HttpContext.Current.Response.End();
             }
 
+            return c;
         }
 
         public static Customer GetByUsername(string username) {
             SqlConnection conn = DatabaseHelper.GetConnection();
+            Customer c = null;
+            string query = "SELECT * FROM customers WHERE username = @USERNAME;";
 
-            using (conn) {
+            try {
+                using (conn) {
+                    using (SqlCommand command = new SqlCommand(query, conn)) {
+                        command.Parameters.AddWithValue("@USERNAME", username);
+                        conn.Open();
 
-                SqlCommand command = new SqlCommand(
-                        "SELECT * " +
-                        "FROM customers " +
-                        "WHERE username = @USERNAME;", conn);
-
-                command.Parameters.AddWithValue("@USERNAME", username);
-
-                conn.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read()) {
-                    return new Customer(
-                        Convert.ToInt32(reader["customerid"]),
-                        Convert.ToString(reader["username"]),
-                        Convert.ToString(reader["firstname"]),
-                        Convert.ToString(reader["lastname"]),
-                        Convert.ToString(reader["password"])
-                    );
-
-                } else {
-                    return null;
+                        using (SqlDataReader reader = command.ExecuteReader()) {
+                            if (reader.Read()) {
+                                c = ConstructCustomerFromReader(reader);
+                            }
+                        }
+                    }
                 }
+            } catch(Exception ex) {
+                HttpContext.Current.Response.Write("Whoopsies! An error occurred." + ex);
+                HttpContext.Current.Response.End();
             }
 
+            return c;
         }
 
         public static Customer GetByCookie(string sessionId) {
+
+            string query = "SELECT * FROM sessions " +
+                            "INNER JOIN customers ON customers.customerid = sessions.customerid " +
+                            "WHERE cookie = @COOKIE;";
+
 
             Customer c = GetFromCache(sessionId);
             if (c != null) {
@@ -161,36 +154,41 @@ namespace lab5 {
                 return c;
             }
 
-            SqlConnection conn = DatabaseHelper.GetConnection();
-            using (conn) {
-                SqlCommand command = new SqlCommand(
-                    "SELECT * " +
-                    "FROM sessions " +
-                    "INNER JOIN customers ON customers.customerid = sessions.customerid " +
-                    "WHERE cookie = @COOKIE;", conn);
+            try {
+                using (SqlConnection conn = DatabaseHelper.GetConnection()) {
+                    using (SqlCommand command = new SqlCommand(query, conn)) {
 
-                command.Parameters.Add("@COOKIE", SqlDbType.VarChar).Value = sessionId;
+                        command.Parameters.Add("@COOKIE", SqlDbType.VarChar).Value = sessionId;
+                        conn.Open();
 
-                conn.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read()) {
-
-                    c = new Customer(
-                        Convert.ToString(reader["firstname"]),
-                        Convert.ToString(reader["lastname"])
-                    );
-
-                    HttpContext.Current.Cache.Insert(sessionId, c, null, DateTime.Now.AddSeconds(30), TimeSpan.Zero); // cache for 30s
-
-                    return c;
-
-                } else {
-                    return null;
+                        using (SqlDataReader reader = command.ExecuteReader()) {
+                            if (reader.Read()) {
+                                c = ConstructCustomerFromReader(reader);
+                                HttpContext.Current.Cache.Insert(sessionId, c, null, DateTime.Now.AddSeconds(30), TimeSpan.Zero); // cache for 30s
+                            }
+                        }
+                    }
                 }
+
+            } catch(Exception ex) {
+                HttpContext.Current.Response.Write("Whoopsies! An error occurred." + ex);
+                HttpContext.Current.Response.End();
             }
+
+            return c;
+         
         }
+
+        private static Customer ConstructCustomerFromReader(SqlDataReader reader) {
+            return new Customer(
+                Convert.ToInt32(reader["customerid"]),
+                Convert.ToString(reader["username"]),
+                Convert.ToString(reader["firstname"]),
+                Convert.ToString(reader["lastname"]),
+                Convert.ToString(reader["password"])
+            );
+        }
+
         public static Customer GetFromCache(string sessionId) {
             return (Customer)HttpContext.Current.Cache.Get(sessionId);
         }

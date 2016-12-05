@@ -44,7 +44,7 @@
                          <li class="dropdown">
                           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                               
-                               <% Response.Write(customer.Firstname + " " + customer.Lastname); %> <!-- Display customers First and Last name (based off of custom cookie)-->
+                               <% Response.Write(customer.GetFullName()); %> <!-- Display customers First and Last name (based off of custom cookie)-->
                               
                               <span class="caret"></span>
                           </a>
