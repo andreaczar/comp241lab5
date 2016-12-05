@@ -12,95 +12,39 @@ using System.Web.Security;
 namespace lab5 {
     public partial class Login : System.Web.UI.Page {
 
-        public static string AuthCookieName = "login";
-
-        public bool Authenticated { get; private set; }
         public bool InvalidLogin = false;
         public Customer RequestCustomer;
 
         protected void Page_Load(object sender, EventArgs e) {
-            Authenticated = HttpContext.Current.User.Identity.IsAuthenticated;
 
-            if (Authenticated) {
+            if (HttpContext.Current.User.Identity.IsAuthenticated) {
                 Response.Redirect("~/Default.aspx");
             }
-            //if (Request.Cookies[Login.AuthCookieName] != null && Authenticated) {
-            //    RequestCustomer = new Customer(Request.Cookies[Login.AuthCookieName].Value);
-            //} else {
-            //    //RequestCustomer = new Customer("No", "body");
-            //}
-
         }
 
         protected void ValidateUser(object sender, EventArgs e) {
-            // do user form validation
-            Authenticated = false;
-
-
+            
+            // validate form input
             if (Username.Text.Length > 16 || Username.Text.Length == 0) {
                 InvalidLogin = true;
+                Response.End();
             }
-            // no session cookie exists
-            if (Request.Cookies[Login.AuthCookieName] == null || !HttpContext.Current.User.Identity.IsAuthenticated) {
 
-                //check username/password
-                // if valid username/password combo, create a session and set cookie.
-
-                int customerId = DatabaseHelper.Authenticate(Username.Text, Password.Text);
-                if (customerId != 0) {
-
-                    HttpCookie userCookie = new HttpCookie(Login.AuthCookieName);
-                    userCookie.Value = Customer.GenerateSessionKey();
-                    userCookie.Expires = DateTime.Now.AddDays(7.0);
-                    Response.SetCookie(userCookie);
-                    Authenticated = true;
-
-
-                    try {
-                        DatabaseHelper.PersistSession(userCookie.Value, customerId);
-                    } catch( Exception ex) {
-                        Response.Write(ex);
-                    }
-
-                    Customer c = Customer.GetById(customerId);
-
-                    if (RememberMe.Checked) {
-                        // create cookie manually
-                        int timeout = (int)TimeSpan.FromDays(7.0).TotalMinutes;
-                        FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(Username.Text, RememberMe.Checked, timeout);
-                        string encryptedTicket = FormsAuthentication.Encrypt(ticket);
-
-                        HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
-                        cookie.Expires = ticket.Expiration;
-                        HttpContext.Current.Response.Cookies.Add(cookie);
-                        string requestedPage = FormsAuthentication.GetRedirectUrl(c.GetFullName(), RememberMe.Checked);
-                        Response.Redirect(requestedPage, true);
-
-                    } else {
-                        // use forms auth for cookie
-                        FormsAuthentication.RedirectFromLoginPage(c.GetFullName(), RememberMe.Checked);
-                    }
-
-                    return;
-
-                } else {
-                    InvalidLogin = true;
-                }
-
-
-            // session cookie exists, should check it.
-            } else {
-                Response.Redirect("~/Default.aspx");
+            if (Request.Cookies[AuthManager.AuthCookieName] != null && HttpContext.Current.User.Identity.IsAuthenticated) {
+                // redirect to default page, user already logged into
+                Response.Redirect("~/Default.aspx", true);
             }
-        }
+              
+            Customer customer = AuthManager.Authenticate(Username.Text, Password.Text);
 
+            if (customer == null) {
+                InvalidLogin = true;
+                Response.End();
+            }
+            
+            // Perform customer login
+            AuthManager.Login(Request, Response, customer, RememberMe.Checked);
 
-
-        protected void LogoutUser(object sender, EventArgs e) {
-            Authenticated = false;
-            Helpers.SignOut();
-
-            Response.Redirect("Login.aspx");
         }
     }
 }

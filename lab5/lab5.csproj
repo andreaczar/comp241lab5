@@ -117,10 +117,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthManager.cs" />
     <Compile Include="BasePage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Helpers.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Default.aspx.cs">

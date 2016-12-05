@@ -10,7 +10,7 @@ namespace lab5
         protected Customer customer;
 
         protected void cmdSignOut_Click(Object sender, EventArgs e) {
-            Helpers.SignOut();
+            AuthManager.Logout(Request, Response);
             Response.Redirect("~/Login.aspx");
         }
 
@@ -18,16 +18,16 @@ namespace lab5
         // create the customer object based on cookie value
         protected void Page_Load(object sender, EventArgs e) {
             if (!HttpContext.Current.User.Identity.IsAuthenticated) {
-                Helpers.SignOut();
+                AuthManager.Logout(Request, Response);
                 Response.Redirect("~/Login.aspx");
                 return;
             }
-            if (HttpContext.Current.Request.Cookies[Login.AuthCookieName] == null) {
-                Helpers.SignOut();
+            if (HttpContext.Current.Request.Cookies[AuthManager.AuthCookieName] == null) {
+                AuthManager.Logout(Request, Response);
                 Response.Redirect("~/Login.aspx");
                 return;
             }
-            customer = Customer.GetByCookie(HttpContext.Current.Request.Cookies[Login.AuthCookieName].Value);
+            customer = Customer.GetByCookie(HttpContext.Current.Request.Cookies[AuthManager.AuthCookieName].Value);
 
             // If customer has session cookie, but no data in DB boot them 
             if(customer == null) {

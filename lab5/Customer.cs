@@ -14,8 +14,10 @@ namespace lab5 {
 
         public string Firstname { get; private set; }
         public string Lastname { get; private set; }
+        public string Username { get; private set; }
         public int Customerid { get; private set; }
         public bool Exists { get; private set; }
+        private string Password;
 
         public string Cookie { get; private set; }
 
@@ -30,8 +32,20 @@ namespace lab5 {
             Lastname = last;
         }
 
+        public Customer(int id, string username, string first, string last, string password) {
+            Customerid = id;
+            Username = username;
+            Firstname = first;
+            Lastname = last;
+            Password = password;
+        }
+
         public string GetFullName() {
             return Firstname + " " + Lastname;
+        }
+
+        public bool CheckPassword(string password) {
+            return password == Password;
         }
 
         private void InitializeCustomer() {
@@ -77,25 +91,64 @@ namespace lab5 {
 
         public static Customer GetById(int id) {
             SqlConnection conn = DatabaseHelper.GetConnection();
-            SqlCommand command = new SqlCommand(
-                   "SELECT * " +
-                   "FROM customers " +
-                   "WHERE customerid = @ID;", conn);
 
-            command.Parameters.AddWithValue("@ID", id);
+            using (conn) {
 
-            conn.Open();
+                SqlCommand command = new SqlCommand(
+                        "SELECT * " +
+                        "FROM customers " +
+                        "WHERE customerid = @ID;", conn);
 
-            SqlDataReader reader = command.ExecuteReader();
+                command.Parameters.AddWithValue("@ID", id);
 
-            if (reader.Read()) {
-                return new Customer(
-                    Convert.ToString(reader["firstname"]),
-                    Convert.ToString(reader["lastname"])
-                );
+                conn.Open();
 
-            } else {
-                return null;
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read()) {
+                    return new Customer(
+                        Convert.ToInt32(reader["customerid"]),
+                        Convert.ToString(reader["username"]),
+                        Convert.ToString(reader["firstname"]),
+                        Convert.ToString(reader["lastname"]),
+                        Convert.ToString(reader["password"])
+                    );
+
+                } else {
+                    return null;
+                }
+            }
+
+        }
+
+        public static Customer GetByUsername(string username) {
+            SqlConnection conn = DatabaseHelper.GetConnection();
+
+            using (conn) {
+
+                SqlCommand command = new SqlCommand(
+                        "SELECT * " +
+                        "FROM customers " +
+                        "WHERE username = @USERNAME;", conn);
+
+                command.Parameters.AddWithValue("@USERNAME", username);
+
+                conn.Open();
+
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read()) {
+                    return new Customer(
+                        Convert.ToInt32(reader["customerid"]),
+                        Convert.ToString(reader["username"]),
+                        Convert.ToString(reader["firstname"]),
+                        Convert.ToString(reader["lastname"]),
+                        Convert.ToString(reader["password"])
+                    );
+
+                } else {
+                    return null;
+                }
             }
 
         }

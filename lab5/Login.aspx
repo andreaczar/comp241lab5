@@ -15,9 +15,6 @@
              
         <div class="row" style="margin-top: 40px;">
 
-
-            <% if (!Authenticated) {%>
-
             <div class="col-md-4 col-md-offset-4 col-sm-12">
 
                 <h2>Super Cool Login Page</h2>
@@ -62,8 +59,6 @@
                 </div>
                     
             </div>
-        
-            <% } %>
            
 
 <%--            <% if (Authenticated) { %>

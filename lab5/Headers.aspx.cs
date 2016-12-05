@@ -39,10 +39,6 @@ namespace lab5 {
             }
 
         }
-        protected void LogoutUser(object sender, EventArgs e) {
-            Helpers.SignOut();
-            Response.Redirect("Login.aspx");
-        }
 
     }
 }

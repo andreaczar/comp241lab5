@@ -34,41 +34,6 @@ namespace lab5 {
             }
         }
 
-        public static int Authenticate(string username, string password) {
-
-            SqlConnection conn = DatabaseHelper.GetConnection();
-
-            using (conn) {
-
-                SqlCommand command = new SqlCommand(
-                    "SELECT * " +
-                    "FROM customers " +
-                    "WHERE username = @USERNAME;", conn);
-
-                command.Parameters.Add("@USERNAME", SqlDbType.Char);
-                command.Parameters["@USERNAME"].Value = username;
-
-                try {
-                    conn.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    ///REMEMBER TO CLOSE READER
-
-                    if (reader.Read()) {
-                        if (Convert.ToString(reader["password"]) == password) {
-                            return Convert.ToInt32(reader["customerid"]);
-                        }
-                        return 0;
-                    }
-                    //CLOSE READER
-
-                } catch (Exception bigbadaboom) {
-
-                }
-            }
-
-            return 0;
-        }
-
         public static void PersistSession(string sessionId, int customerid) {
 
             SqlConnection conn = DatabaseHelper.GetConnection();
