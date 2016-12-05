@@ -68,7 +68,7 @@
                     <i class="fa fa-reddit-alien fa-500px fa-spin" aria-hidden="true"></i>
                     <i class="fa fa-reddit-alien fa-4x fa-spin" aria-hidden="true"></i>
                     <i class="fa fa-reddit-alien fa-4x fa-flip-vertical text-info" aria-hidden="true"></i>
-                                        <i class="fa fa-reddit-alien fa-500x fa-spin" aria-hidden="true"></i>
+                    <i class="fa fa-reddit-alien fa-500x fa-spin" aria-hidden="true"></i>
                     <i class="fa fa-rebel fa-5x fa-spin" aria-hidden="true"></i>
 
                     Weeeeeeeeeee....

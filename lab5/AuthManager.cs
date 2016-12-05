@@ -37,7 +37,7 @@ namespace lab5 {
             if (rememberMe) {
 
                 int timeout = (int)TimeSpan.FromDays(7.0).TotalMinutes;
-                FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(customer.Username, rememberMe, timeout);
+                FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(customer.GetFullName(), rememberMe, timeout);
                 string encryptedTicket = FormsAuthentication.Encrypt(ticket);
 
                 HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
