@@ -48,9 +48,7 @@ namespace lab5 {
                 r.Cells.Add(titleId);
 
                 SalesTable.Rows.Add(r);
-
             }
-
         }
     }
 }

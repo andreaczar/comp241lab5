@@ -7,19 +7,22 @@ using System.Web;
 using System.Web.Caching;
 
 namespace lab5 {
+    /*
+     * Creates customer objects based on Cookies and other stuff. Handles database queries.
+     * Caches users when fetched by session id
+     */
     public class Customer {
 
         private const string sessionChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         public bool IsCached { get; set; } = false;
-
         public string Firstname { get; private set; }
         public string Lastname { get; private set; }
         public string Username { get; private set; }
         public int Customerid { get; private set; }
         public bool Exists { get; private set; }
-        private string Password;
-
         public string Cookie { get; private set; }
+
+        private string Password;
 
         public Customer(string cookie) {
             Cookie = cookie;
@@ -79,40 +82,15 @@ namespace lab5 {
                     }
                 }
             } catch (Exception ex) {
-
-            }
-        }
-
-        public static string GenerateSessionKey() {
-            Random random = new Random();
-            return new string(Enumerable.Repeat(Customer.sessionChars, 32)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        public static Customer GetById(int id) {
-            string query = "SELECT * FROM customers WHERE customerid = @ID;";
-            Customer c = null;
-            SqlConnection conn = DatabaseHelper.GetConnection();
-
-            try {
-                using (conn) {
-                    using (SqlCommand command = new SqlCommand(query, conn)) {
-                        command.Parameters.AddWithValue("@ID", id);
-                        conn.Open();
-
-                        using (SqlDataReader reader = command.ExecuteReader()) {
-                            if (reader.Read()) {
-                                c = ConstructCustomerFromReader(reader);
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
                 HttpContext.Current.Response.Write("Whoopsies! An error occurred." + ex);
                 HttpContext.Current.Response.End();
             }
-
-            return c;
+        }
+        //randomly generates session key of 32 characters
+        public static string GenerateSessionKey() {
+            Random random = new Random();
+            return new string(Enumerable.Repeat(Customer.sessionChars, 32)
+              .Select(s => s[random.Next(s.Length)]).ToArray()); 
         }
 
         public static Customer GetByUsername(string username) {
@@ -140,7 +118,7 @@ namespace lab5 {
 
             return c;
         }
-
+        // Check if Customer is already in cache, if not, query the db by sessionId and add customer to cache
         public static Customer GetByCookie(string sessionId) {
 
             string query = "SELECT * FROM sessions " +
@@ -176,7 +154,6 @@ namespace lab5 {
             }
 
             return c;
-         
         }
 
         private static Customer ConstructCustomerFromReader(SqlDataReader reader) {

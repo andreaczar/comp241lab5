@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace lab5
-{
+namespace lab5{
+    /*
+     * Inherited by all pages dealing with signing out and invalid/missing cookies 
+     * and fetches the customer object
+     */
     public partial class BasePage : System.Web.UI.Page {
 
         protected Customer customer;

@@ -14,11 +14,18 @@ namespace lab5 {
 
         public bool InvalidLogin = false;
         public Customer RequestCustomer;
+        public Customer CurrentCustomer;
+        public string Cookie;
 
         protected void Page_Load(object sender, EventArgs e) {
 
+            CurrentCustomer = null;
             if (HttpContext.Current.User.Identity.IsAuthenticated) {
-                Response.Redirect("~/Default.aspx");
+                CurrentCustomer = Customer.GetByCookie(Request.Cookies[AuthManager.AuthCookieName].Value);
+                //Response.Redirect("~/Default.aspx");
+            }
+            if (CurrentCustomer != null) {
+                Cookie = Request.Cookies[AuthManager.AuthCookieName].Value;
             }
         }
 

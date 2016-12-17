@@ -49,7 +49,6 @@ namespace lab5 {
                 HttpContext.Current.Response.Write("Whoopsies, an error occurred fetching sales...");
                 HttpContext.Current.Response.End();
             }
-
             
             return sales;
         }

@@ -7,6 +7,10 @@ using System.Web;
 using System.Web.Security;
 
 namespace lab5 {
+    /**
+     * Authentication utilities and Cookie management  
+     */
+
     public class AuthManager {
 
         public static string AuthCookieName = "login";

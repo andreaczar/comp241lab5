@@ -7,6 +7,9 @@ using System.Web;
 using System.Web.Configuration;
 
 namespace lab5 {
+    /*
+     * Queries DB for session information
+     */ 
     public class DatabaseHelper {
 
         public static SqlConnection GetConnection() {
@@ -16,44 +19,40 @@ namespace lab5 {
         }
 
         public static void ClearSession(string sessionId) {
-            SqlConnection conn = DatabaseHelper.GetConnection();
+            string query = "DELETE FROM sessions WHERE cookie = @cookie;";
 
-            using (conn) {
+            try {
+                using (SqlConnection conn = DatabaseHelper.GetConnection()) {
+                    using (SqlCommand command = new SqlCommand(query, conn)) {
+                        command.Parameters.Add("@cookie", SqlDbType.VarChar, 50).Value = sessionId;
+                        conn.Open();
 
-                SqlCommand command = new SqlCommand(
-                    "DELETE FROM sessions WHERE cookie = @cookie;", conn);
-
-                command.Parameters.Add("@cookie", SqlDbType.VarChar, 50).Value = sessionId;
-
-                //try {
-                conn.Open();
-                command.ExecuteNonQuery();
-                //} catch (Exception bigbadaboom) {
-                //Response.Write(bigbadaboom);
-                //}
+                        command.ExecuteNonQuery();
+                    }
+                }
+            } catch (Exception bigbadaboom) {
+                HttpContext.Current.Response.Write("Error clearing session: " + bigbadaboom);
+                HttpContext.Current.Response.End();
             }
         }
 
         public static void PersistSession(string sessionId, int customerid) {
+            string query = "INSERT INTO sessions (customerid, cookie) VALUES (@customerid, @cookie);";
 
-            SqlConnection conn = DatabaseHelper.GetConnection();
+            try {
+                using (SqlConnection conn = DatabaseHelper.GetConnection()) {
+                    using (SqlCommand command = new SqlCommand(query, conn)) {
+                        command.Parameters.Add("@customerid", SqlDbType.Int).Value = customerid;
+                        command.Parameters.Add("@cookie", SqlDbType.Text, 50).Value = sessionId;
 
-            using (conn) {
-
-                SqlCommand command = new SqlCommand(
-                    "INSERT INTO sessions (customerid, cookie) VALUES (@customerid, @cookie);", conn);
-
-                command.Parameters.Add("@customerid", SqlDbType.Int).Value = customerid;
-                command.Parameters.Add("@cookie", SqlDbType.Text, 50).Value = sessionId;
-
-                //try {
-                conn.Open();
-                command.ExecuteNonQuery();
-                //} catch (Exception bigbadaboom) {
-                //Response.Write(bigbadaboom);
-                //}
+                        conn.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            } catch (Exception bigbadaboom) {
+                HttpContext.Current.Response.Write(bigbadaboom);
+                HttpContext.Current.Response.End();
             }
         }
-
     }
 }

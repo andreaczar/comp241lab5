@@ -8,19 +8,16 @@ using System.Web.UI.WebControls;
 
 namespace lab5 {
     public partial class Headers : BasePage {
-
      
         public static string AuthCookieName = "login";
 
         protected void Page_Load(object sender, EventArgs e) {
             base.Page_Load(sender, e);
 
-            //Iterate through HTTP headers
+            // Iterate through HTTP headers
             // Display their keys and values
             // Headers in Request.Header property
             // Response.Write() to generate appropriate HTML 
-
-
             NameValueCollection headers = Request.Headers;
 
             foreach(string key in Request.Headers) {
@@ -37,8 +34,6 @@ namespace lab5 {
                 row.Cells.Add(value);
                 HeadersTable.Rows.Add(row);
             }
-
         }
-
     }
 }

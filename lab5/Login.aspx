@@ -15,7 +15,9 @@
              
         <div class="row" style="margin-top: 40px;">
 
-            <div class="col-md-4 col-md-offset-4 col-sm-12">
+             <% if (CurrentCustomer == null) { %>
+
+                <div class="col-md-4 col-md-offset-4 col-sm-12">
 
                 <h2>Super Cool Login Page</h2>
                 <% if (InvalidLogin) { %>
@@ -59,36 +61,25 @@
                 </div>
                     
             </div>
-           
 
-<%--            <% if (Authenticated) { %>
+            <% } else { %>
+
                 <p>
-                    <b>First Name:</b> <% Response.Write(RequestCustomer.Firstname); %>
+                    <b>First Name:</b> <% Response.Write(CurrentCustomer.Firstname); %>
                 </p>
             
                 <p>
-                    <b>Last Name:</b> <% Response.Write(RequestCustomer.Lastname); %>
+                    <b>Last Name:</b> <% Response.Write(CurrentCustomer.Lastname); %>
                 </p>
             
                 <p>
-                    <b>Customer ID:</b> <% Response.Write(RequestCustomer.Customerid); %>
+                    <b>Customer ID:</b> <% Response.Write(CurrentCustomer.Customerid); %>
                 </p>
             
                 <p>
-                    <b>Session ID:</b> <% Response.Write(RequestCustomer.Cookie); %>
+                    <b>Session ID:</b> <% Response.Write(Cookie); %>
                 </p>
-            
-                <input id="Logout" runat="server" value="Logout" type="submit" OnServerClick="LogoutUser"/>
-            <% } %>--%>
+            <% } %>
 
-
-
-<%--        </div>
-
-            <% if (Authenticated) { %>
-            <a href="Headers.aspx">Headers</a>
-            <%  } %>
-
-     </div>--%>
 </body>
 </html>
